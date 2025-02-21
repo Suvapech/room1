@@ -37,39 +37,38 @@ class RoomController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:10',
-            'room_id' => 'required|string|exists:rooms,id',
-            'room_number' => 'required|string|regex:/^[A-Za-z0-9]+$/',
-            'check_in_date' => 'required|date|after_or_equal:today',
-            'check_out_date' => 'required|date|after:check_in_date',
+{
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'customer_phone' => 'required|string|max:10',
+        'room_id' => 'required|string|exists:rooms,id',
+        'check_in_date' => 'required|date|after_or_equal:today',
+        'check_out_date' => 'required|date|after:check_in_date',
+    ]);
+
+    DB::transaction(function () use ($validated) {
+        $customer = Customer::firstOrCreate(
+            ['phone' => $validated['customer_phone']],
+            ['name' => $validated['customer_name']]
+        );
+
+        $room = Room::findOrFail($validated['room_id']);
+        if ($room->status !== 'not_reserved') {
+            throw new \Exception('ห้องนี้ถูกจองแล้ว');
+        }
+
+        Booking::create([
+            'customer_id' => $customer->id,
+            'room_id' => $validated['room_id'],
+            'check_in_date' => $validated['check_in_date'],
+            'check_out_date' => $validated['check_out_date'],
         ]);
 
-        DB::transaction(function () use ($validated) {
-            $customer = Customer::firstOrCreate(
-                ['phone' => $validated['customer_phone']],
-                ['name' => $validated['customer_name']]
-            );
+        $room->update(['status' => 'reserved']);
+    });
 
-            $room = Room::findOrFail($validated['room_id']);
-            if ($room->status !== 'not_reserved') {
-                throw new \Exception('ห้องนี้ถูกจองแล้ว');
-            }
-
-            Booking::create([
-                'customer_id' => $customer->id,
-                'room_id' => $validated['room_id'],
-                'check_in_date' => $validated['check_in_date'],
-                'check_out_date' => $validated['check_out_date'],
-            ]);
-
-            $room->update(['status' => 'reserved']);
-        });
-
-        return redirect()->route('rooms.index')->with('success', 'การจองสำเร็จแล้ว');
-    }
+    return redirect()->route('rooms.index')->with('success', 'การจองสำเร็จแล้ว');
+}
 
     public function edit($id)
     {
@@ -88,12 +87,11 @@ class RoomController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:255',
-            'room_id' => 'required|exists:rooms,id',
-            'room_number' => 'required|string|regex:/^[A-Za-z0-9]+$/',
-            'check_in_date' => 'required|date',
+            'customer_phone' => 'required|string|max:10',
+            'room_id' => 'required|string|exists:rooms,id',
+            'check_in_date' => 'required|date|after_or_equal:today',
             'check_out_date' => 'required|date|after:check_in_date',
-        ]);
+        ]);        
 
         DB::transaction(function () use ($validated, $id) {
             $booking = Booking::findOrFail($id);

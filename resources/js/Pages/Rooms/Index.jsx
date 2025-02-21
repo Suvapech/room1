@@ -65,7 +65,7 @@ export default function Index() {
 
         // กรองการจองที่ไม่ใช่การจองที่ต้องการลบ
         const updatedBookings = filteredBookings.filter(booking => booking.id !== id);
-        
+
         // อัพเดตสถานะของ booking ใน state เพื่อแสดงผลในตาราง
         setFilteredBookings(updatedBookings);
 

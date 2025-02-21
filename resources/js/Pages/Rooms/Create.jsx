@@ -6,50 +6,20 @@ export default function Create({ rooms }) {
   const { data, setData, post, errors } = useForm({
     customer_name: '',
     customer_phone: '',
-    room_id: '',
+    room_id: '', // เปลี่ยนจาก room_number เป็น room_id
     check_in_date: '',
     check_out_date: '',
   });
-
-  // แสดงข้อมูลที่ดึงมา
-  console.log('Rooms:', rooms);
 
   // คัดกรองห้องที่สามารถจองได้ (เฉพาะ A1 - A10 และ B1 - B10)
   const availableRooms = rooms.filter(
     (room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number)
   );
 
-  console.log('Available Rooms:', availableRooms); // ตรวจสอบว่าเลขห้องถูกต้องหรือไม่
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!data.customer_name || !data.customer_phone) {
-      Swal.fire({
-        icon: 'error',
-        title: 'ข้อมูลไม่ครบถ้วน',
-        text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
-      });
-      return;
-    }
-
-    if (!data.room_id || !availableRooms.some((room) => room.id === parseInt(data.room_id))) {
-      Swal.fire({
-        icon: 'error',
-        title: 'ห้องที่เลือกไม่ถูกต้อง',
-        text: 'กรุณาเลือกห้องที่สามารถจองได้',
-      });
-      return;
-    }
-
-    if (new Date(data.check_out_date) <= new Date(data.check_in_date)) {
-      Swal.fire({
-        icon: 'error',
-        title: 'วันที่ไม่ถูกต้อง',
-        text: 'วันที่เช็คเอาท์ต้องมากกว่าวันที่เช็คอิน',
-      });
-      return;
-    }
+    console.log("Data sent to backend:", data); // 🛠 ตรวจสอบค่าที่ถูกส่ง
 
     post('/bookings', {
       onSuccess: () => {
@@ -57,19 +27,17 @@ export default function Create({ rooms }) {
           icon: 'success',
           title: 'การจองสำเร็จ',
           text: 'การจองของคุณถูกบันทึกแล้ว',
-          timer: 3000,
-          showConfirmButton: false,
         });
       },
       onError: (errors) => {
-        console.error(errors); // แสดงข้อมูลข้อผิดพลาดจากเซิร์ฟเวอร์
+        console.error("Error response:", errors);
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: `ไม่สามารถบันทึกการจองได้: ${errors.message || 'กรุณาลองใหม่อีกครั้ง'}`,
+          text: errors.room_id || errors.message || 'กรุณาลองใหม่อีกครั้ง',
         });
-      },      
-    });    
+      },
+    });
   };
 
   return (
@@ -103,20 +71,14 @@ export default function Create({ rooms }) {
           <div>
             <label className="block mb-2 text-lg font-medium text-gray-700">Room Number</label>
             <select
-              value={data.room_id}
-              onChange={(e) => setData('room_id', e.target.value)}
-              className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
+              value={data.room_id || ''}
+              onChange={(e) => setData('room_id', e.target.value)}>
               <option value="">-- เลือกหมายเลขห้อง --</option>
-              {availableRooms.length > 0 ? (
-                availableRooms.map((room) => (
-                  <option key={room.id} value={room.id}>
-                    {room.room_number}
-                  </option>
-                ))
-              ) : (
-                <option disabled>ไม่มีห้องว่าง</option>
-              )}
+              {availableRooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.room_number}
+                </option>
+              ))}
             </select>
             {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
           </div>
