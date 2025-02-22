@@ -84,37 +84,49 @@ class RoomController extends Controller
     }
     
     public function update(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:10',
-            'room_id' => 'required|string|exists:rooms,id',
-            'check_in_date' => 'required|date|after_or_equal:today',
-            'check_out_date' => 'required|date|after:check_in_date',
-        ]);        
+{
+    // ทำการ validate ข้อมูลจากฟอร์ม
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'customer_phone' => 'required|string|max:10',
+        'room_id' => 'required|string|exists:rooms,id',
+        'check_in_date' => 'required|date|after_or_equal:today',
+        'check_out_date' => 'required|date|after:check_in_date',
+    ]);        
 
-        DB::transaction(function () use ($validated, $id) {
-            $booking = Booking::findOrFail($id);
+    // ใช้ transaction เพื่อป้องกันการเปลี่ยนแปลงข้อมูลหลายๆ จุดพร้อมกัน
+    DB::transaction(function () use ($validated, $id) {
+        $booking = Booking::findOrFail($id);
 
-            // อัปเดตข้อมูลการจอง
-            $booking->update([
-                'check_in_date' => $validated['check_in_date'],
-                'check_out_date' => $validated['check_out_date'],
-                'room_id' => $validated['room_id'],
-            ]);
+        // ตรวจสอบว่าห้องที่เลือกยังคงสถานะ 'not_reserved' อยู่หรือไม่
+        $room = Room::findOrFail($validated['room_id']);
+        if ($room->status !== 'not_reserved' && $room->id !== $booking->room_id) {
+            throw new \Exception('ห้องนี้ถูกจองแล้ว');
+        }
 
-            // อัปเดตข้อมูลลูกค้า
-            $customer = Customer::find($booking->customer_id);
-            $customer->update([
-                'name' => $validated['customer_name'],
-                'phone' => $validated['customer_phone'],
-            ]);
-        });
+        // อัปเดตข้อมูลการจอง
+        $booking->update([
+            'check_in_date' => $validated['check_in_date'],
+            'check_out_date' => $validated['check_out_date'],
+            'room_id' => $validated['room_id'],
+        ]);
 
-        return redirect()->route('rooms.index')->with('success', 'อัปเดตข้อมูลสำเร็จแล้ว');
-    }
+        // อัปเดตข้อมูลลูกค้า
+        $customer = Customer::find($booking->customer_id);
+        $customer->update([
+            'name' => $validated['customer_name'],
+            'phone' => $validated['customer_phone'],
+        ]);
 
-    
+        // หากห้องถูกเปลี่ยนไป ให้ปรับสถานะห้องเก่าเป็น 'not_reserved'
+        if ($room->id !== $booking->room_id) {
+            $booking->room->update(['status' => 'not_reserved']);
+            $room->update(['status' => 'reserved']);
+        }
+    });
+
+    return redirect()->route('rooms.index')->with('success', 'อัปเดตข้อมูลสำเร็จแล้ว');
+}
 
     public function destroy($id)
     {

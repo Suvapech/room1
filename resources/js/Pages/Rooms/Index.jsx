@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Swal from 'sweetalert2';
 
 export default function Index() {
@@ -11,7 +10,6 @@ export default function Index() {
   const [filteredBookings, setFilteredBookings] = useState(bookings);
   const itemsPerPage = 10;
 
-  // เมื่อโหลดหน้าเว็บใหม่ ให้กรองข้อมูลที่ถูกลบออกจากการแสดงผล
   useEffect(() => {
     const deletedBookings = JSON.parse(localStorage.getItem('deletedBookings')) || [];
     const updatedBookings = bookings.filter(booking => !deletedBookings.includes(booking.id));
@@ -23,14 +21,6 @@ export default function Index() {
   const sortedBookings = [...filteredBookings].sort((a, b) => {
     const dateA = a.check_in_date ? new Date(a.check_in_date) : new Date(0);
     const dateB = b.check_in_date ? new Date(b.check_in_date) : new Date(0);
-
-    const yearA = dateA.getFullYear();
-    const yearB = dateB.getFullYear();
-
-    if (yearA !== yearB) {
-      return yearA - yearB; // เรียงจากปีเก่าก่อน
-    }
-
     return dateA - dateB;
   });
 
@@ -47,13 +37,13 @@ export default function Index() {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-
+  
     const filtered = bookings.filter(booking =>
       [booking.customer_name, booking.customer_phone, booking.room_number]
         .some(field => field?.toLowerCase().includes(e.target.value.toLowerCase()))
     );
     setFilteredBookings(filtered);
-  };
+  };  
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -79,30 +69,18 @@ export default function Index() {
     });
   };
 
-  const calculateTotalPrice = (checkInDate, checkOutDate, pricePerNight) => {
-    if (!checkInDate || !checkOutDate || !pricePerNight) return 0;
+  const calculateTotalPrice = (checkInDate, checkOutDate, pricePerNight = 1000) => {
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
-    const days = (checkOut - checkIn) / (1000 * 3600 * 24); 
-    return days > 0 ? days * pricePerNight : 0;
+    const diffInTime = checkOut - checkIn;
+    const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+    return diffInDays * pricePerNight;
   };
-
-  const roomBookingCount = filteredBookings.reduce((acc, booking) => {
-    const room = booking.room_number || "ไม่ระบุ";
-    acc[room] = (acc[room] || 0) + 1;
-    return acc;
-  }, {});
-
-  const chartData = Object.entries(roomBookingCount)
-    .map(([room, count]) => ({ room, count }))
-    .sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
-
-  const totalBookings = filteredBookings.length;
 
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto p-8 bg-white shadow-xl rounded-lg border border-gray-200">
-        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายชื่อการจองที่พัก</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายการการจองที่พัก</h2>
 
         <div className="flex justify-center mb-6 space-x-4">
           <input
@@ -120,8 +98,6 @@ export default function Index() {
           </Link>
         </div>
 
-        <p className="text-center mb-4 text-lg">ยอดการจองทั้งหมด: {totalBookings} การจอง</p>
-
         {currentBookings.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
@@ -133,7 +109,7 @@ export default function Index() {
                   <th className="py-3 px-4 text-left">สถานะห้อง</th>
                   <th className="py-3 px-4 text-left">วันที่เช็คอิน</th>
                   <th className="py-3 px-4 text-left">วันที่เช็คเอาท์</th>
-                  <th className="py-3 px-4 text-left">ราคาที่พัก</th>
+                  <th className="py-3 px-4 text-left">ราคา</th>
                   <th className="py-3 px-4 text-center">การจัดการ</th>
                 </tr>
               </thead>
@@ -153,7 +129,13 @@ export default function Index() {
                       {booking.check_out_date ? new Date(booking.check_out_date).toLocaleDateString() : "ไม่ระบุ"}
                     </td>
                     <td className="py-3 px-4">
-                      {calculateTotalPrice(booking.check_in_date, booking.check_out_date, booking.price_per_night)} บาท
+                      {booking.check_in_date && booking.check_out_date ? (
+                        <span>
+                          {`${calculateTotalPrice(booking.check_in_date, booking.check_out_date, booking.room_price).toLocaleString()} บาท`}
+                        </span>
+                      ) : (
+                        "ไม่ระบุ"
+                      )}
                     </td>
                     <td className="py-3 px-4 flex justify-center space-x-2">
                       <Link
@@ -192,18 +174,6 @@ export default function Index() {
             ถัดไป
           </button>
         </div>
-      </div>
-      <div className="mt-8 bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-xl font-bold text-center mb-4">จำนวนการจองตามหมายเลขห้อง</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="room" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="count" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
     </AuthenticatedLayout>
   );

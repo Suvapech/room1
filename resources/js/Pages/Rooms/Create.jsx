@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Swal from 'sweetalert2';
-import { QRCodeCanvas } from 'qrcode.react'; // ✅ นำเข้า QRCodeCanvas
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function Create({ rooms }) {
   const { data, setData, post, errors } = useForm({
@@ -11,6 +12,20 @@ export default function Create({ rooms }) {
     check_in_date: '',
     check_out_date: '',
   });
+
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    if (data.check_in_date && data.check_out_date) {
+      const checkIn = new Date(data.check_in_date);
+      const checkOut = new Date(data.check_out_date);
+      const diffTime = checkOut.getTime() - checkIn.getTime();
+      const diffDays = Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 1);
+      setTotalPrice(diffDays * 1000);
+    } else {
+      setTotalPrice(0);
+    }
+  }, [data.check_in_date, data.check_out_date]);
 
   const availableRooms = rooms
     .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
@@ -22,21 +37,20 @@ export default function Create({ rooms }) {
   // ใช้ Set เพื่อกรองห้องที่ไม่ซ้ำ
   const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
     .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
-    
-  const handleSubmit = (e) => {
 
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     post('/bookings', {
       onSuccess: () => {
-        const paymentURL = `https://quickchart.io/qr?text=https://example.com/payment&size=200`;
+        const paymentURL = `https://promptpay.io/0832654075/${totalPrice}`;
 
         Swal.fire({
           title: 'การจองสำเร็จ',
           html: `
-            <p>กรุณาชำระเงินจำนวน <strong>4,500 บาท</strong></p>
+            <p>กรุณาชำระเงินจำนวน <strong>${totalPrice.toLocaleString()} บาท</strong></p>
             <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-              <img src="${paymentURL}" alt="QR Code" width="200" height="200" />
+              <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentURL)}&size=200x200" alt="QR Code" />
             </div>
           `,
           confirmButtonText: 'เสร็จสิ้น',
@@ -119,6 +133,10 @@ export default function Create({ rooms }) {
               className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.check_out_date && <div className="text-red-500 mt-1">{errors.check_out_date}</div>}
+          </div>
+
+          <div className="text-xl font-semibold text-center text-blue-700">
+            ราคาทั้งหมด: {totalPrice.toLocaleString()} บาท
           </div>
 
           <button
