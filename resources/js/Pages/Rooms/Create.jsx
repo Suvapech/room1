@@ -6,18 +6,21 @@ export default function Create({ rooms }) {
   const { data, setData, post, errors } = useForm({
     customer_name: '',
     customer_phone: '',
-    room_id: '', // เปลี่ยนจาก room_number เป็น room_id
+    room_id: '',
     check_in_date: '',
     check_out_date: '',
   });
 
   const availableRooms = rooms
-  .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
-  .sort((a, b) => {
-    const getNumber = (room) => parseInt(room.room_number.slice(1), 10);
-    return getNumber(a) - getNumber(b);
-  });
+    .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
+    .sort((a, b) => {
+      const getNumber = (room) => parseInt(room.room_number.slice(1), 10);
+      return getNumber(a) - getNumber(b);
+    });
 
+  // ใช้ Set เพื่อกรองห้องที่ไม่ซ้ำ
+  const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
+    .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -79,7 +82,7 @@ export default function Create({ rooms }) {
               className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value="">-- เลือกหมายเลขห้อง --</option>
-              {availableRooms.map((room) => (
+              {uniqueRooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   {room.room_number}
                 </option>
