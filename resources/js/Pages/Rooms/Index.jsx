@@ -80,7 +80,7 @@ export default function Index() {
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto p-8 bg-white shadow-xl rounded-lg border border-gray-200">
-        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายการการจองที่พัก</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายชื่อลูกค้าจองที่พัก</h2>
 
         <div className="flex justify-center mb-6 space-x-4">
           <input
