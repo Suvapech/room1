@@ -16,8 +16,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('products', [ProductController::class, 'index']); // แสดงรายการสินค้าจาก ProductController
-
 Route::get('/rooms', [RoomController::class, 'index'])->middleware(['auth', 'verified'])->name("rooms.index");
 
 Route::get('/rooms/create', [RoomController::class, 'create'])->middleware(['auth', 'verified'])->name('rooms.create');

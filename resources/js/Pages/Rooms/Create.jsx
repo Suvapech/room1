@@ -11,10 +11,13 @@ export default function Create({ rooms }) {
     check_out_date: '',
   });
 
-  // คัดกรองห้องที่สามารถจองได้ (เฉพาะ A1 - A10 และ B1 - B10)
-  const availableRooms = rooms.filter(
-    (room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number)
-  );
+  const availableRooms = rooms
+  .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
+  .sort((a, b) => {
+    const getNumber = (room) => parseInt(room.room_number.slice(1), 10);
+    return getNumber(a) - getNumber(b);
+  });
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,11 +46,11 @@ export default function Create({ rooms }) {
   return (
     <AuthenticatedLayout>
       <div className="p-8 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">Create Booking</h1>
+        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">เพิ่มการจองที่พัก</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Customer Name</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">ชื่อของลูกค้า</label>
             <input
               type="text"
               value={data.customer_name}
@@ -58,7 +61,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Customer Phone</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">เบอร์โทร</label>
             <input
               type="text"
               value={data.customer_phone}
@@ -69,10 +72,12 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Room Number</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
             <select
               value={data.room_id || ''}
-              onChange={(e) => setData('room_id', e.target.value)}>
+              onChange={(e) => setData('room_id', e.target.value)}
+              className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
               <option value="">-- เลือกหมายเลขห้อง --</option>
               {availableRooms.map((room) => (
                 <option key={room.id} value={room.id}>
@@ -80,11 +85,12 @@ export default function Create({ rooms }) {
                 </option>
               ))}
             </select>
+
             {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Check-in Date</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">วันที่เช็คอิน</label>
             <input
               type="date"
               value={data.check_in_date}
@@ -96,7 +102,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Check-out Date</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">วันที่เช็คเอาท์</label>
             <input
               type="date"
               value={data.check_out_date}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Swal from 'sweetalert2';
 
 export default function Index() {
@@ -22,7 +23,17 @@ export default function Index() {
   const sortedBookings = [...filteredBookings].sort((a, b) => {
     const dateA = a.check_in_date ? new Date(a.check_in_date) : new Date(0);
     const dateB = b.check_in_date ? new Date(b.check_in_date) : new Date(0);
-    return dateA - dateB; // เรียงจากวันเก่าไปใหม่
+
+    // เปรียบเทียบปีของวันที่เช็คอินก่อน
+    const yearA = dateA.getFullYear();
+    const yearB = dateB.getFullYear();
+
+    if (yearA !== yearB) {
+      return yearA - yearB; // เรียงจากปีเก่าก่อน
+    }
+
+    // หากปีเดียวกัน ให้เรียงตามวันที่เช็คอิน
+    return dateA - dateB;
   });
 
   const currentBookings = sortedBookings.slice(
@@ -73,11 +84,23 @@ export default function Index() {
       }
     });
   };
+  // นับจำนวนการจองตามหมายเลขห้อง
+  const roomBookingCount = filteredBookings.reduce((acc, booking) => {
+    const room = booking.room_number || "ไม่ระบุ";
+    acc[room] = (acc[room] || 0) + 1;
+    return acc;
+  }, {});
+
+  // แปลงข้อมูลให้อยู่ในรูปแบบที่ใช้กับ Recharts และเรียงลำดับห้อง
+const chartData = Object.entries(roomBookingCount)
+.map(([room, count]) => ({ room, count }))
+.sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
+
 
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto p-8 bg-white shadow-xl rounded-lg border border-gray-200">
-        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายการการจองที่พัก</h2>
+        <h2 className="text-3xl font-bold text-center mb-6 text-black-600">รายชื่อการจองที่พัก</h2>
 
         <div className="flex justify-center mb-6 space-x-4">
           <input
@@ -161,6 +184,18 @@ export default function Index() {
             ถัดไป
           </button>
         </div>
+      </div>
+      <div className="mt-8 bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-xl font-bold text-center mb-4">จำนวนการจองตามหมายเลขห้อง</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="room" label={{ value: 'หมายเลขห้อง', position: 'insideBottom', dy: 10 }} />
+            <YAxis label={{ value: 'จำนวนการจอง', angle: -90, position: 'insideLeft' }} />
+            <Tooltip />
+            <Bar dataKey="count" fill="#8884d8" barSize={40} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </AuthenticatedLayout>
   );
