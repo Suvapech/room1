@@ -33,6 +33,18 @@ export default function Edit() {
     });
   };
 
+  // กรองห้องที่ไม่ซ้ำกัน
+  const availableRooms = rooms
+    .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
+    .sort((a, b) => {
+      const getNumber = (room) => parseInt(room.room_number.slice(1), 10);
+      return getNumber(a) - getNumber(b);
+    });
+
+  // ใช้ Set เพื่อกรองห้องที่ไม่ซ้ำ
+  const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
+    .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
+
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto p-8 max-w-3xl bg-green shadow-lg rounded-xl">
@@ -68,7 +80,7 @@ export default function Edit() {
               onChange={handleChange}
               className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
-              {rooms.map((room) => (
+              {uniqueRooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   ห้อง {room.room_number} ({room.status})
                 </option>

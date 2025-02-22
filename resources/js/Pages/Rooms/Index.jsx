@@ -24,7 +24,6 @@ export default function Index() {
     const dateA = a.check_in_date ? new Date(a.check_in_date) : new Date(0);
     const dateB = b.check_in_date ? new Date(b.check_in_date) : new Date(0);
 
-    // เปรียบเทียบปีของวันที่เช็คอินก่อน
     const yearA = dateA.getFullYear();
     const yearB = dateB.getFullYear();
 
@@ -32,7 +31,6 @@ export default function Index() {
       return yearA - yearB; // เรียงจากปีเก่าก่อน
     }
 
-    // หากปีเดียวกัน ให้เรียงตามวันที่เช็คอิน
     return dateA - dateB;
   });
 
@@ -69,33 +67,37 @@ export default function Index() {
       cancelButtonText: 'ยกเลิก'
     }).then((result) => {
       if (result.isConfirmed) {
-        // เก็บ id ของการจองที่ถูกลบใน localStorage
         const deletedBookings = JSON.parse(localStorage.getItem('deletedBookings')) || [];
         deletedBookings.push(id);
         localStorage.setItem('deletedBookings', JSON.stringify(deletedBookings));
 
-        // กรองการจองที่ไม่ใช่การจองที่ต้องการลบ
         const updatedBookings = filteredBookings.filter(booking => booking.id !== id);
-
-        // อัพเดตสถานะของ booking ใน state เพื่อแสดงผลในตาราง
         setFilteredBookings(updatedBookings);
 
         Swal.fire('ลบสำเร็จ!', 'การจองถูกลบแล้ว', 'success');
       }
     });
   };
-  // นับจำนวนการจองตามหมายเลขห้อง
+
+  const calculateTotalPrice = (checkInDate, checkOutDate, pricePerNight) => {
+    if (!checkInDate || !checkOutDate || !pricePerNight) return 0;
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+    const days = (checkOut - checkIn) / (1000 * 3600 * 24); 
+    return days > 0 ? days * pricePerNight : 0;
+  };
+
   const roomBookingCount = filteredBookings.reduce((acc, booking) => {
     const room = booking.room_number || "ไม่ระบุ";
     acc[room] = (acc[room] || 0) + 1;
     return acc;
   }, {});
 
-  // แปลงข้อมูลให้อยู่ในรูปแบบที่ใช้กับ Recharts และเรียงลำดับห้อง
-const chartData = Object.entries(roomBookingCount)
-.map(([room, count]) => ({ room, count }))
-.sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
+  const chartData = Object.entries(roomBookingCount)
+    .map(([room, count]) => ({ room, count }))
+    .sort((a, b) => a.room.localeCompare(b.room, undefined, { numeric: true }));
 
+  const totalBookings = filteredBookings.length;
 
   return (
     <AuthenticatedLayout>
@@ -118,6 +120,8 @@ const chartData = Object.entries(roomBookingCount)
           </Link>
         </div>
 
+        <p className="text-center mb-4 text-lg">ยอดการจองทั้งหมด: {totalBookings} การจอง</p>
+
         {currentBookings.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
@@ -129,6 +133,7 @@ const chartData = Object.entries(roomBookingCount)
                   <th className="py-3 px-4 text-left">สถานะห้อง</th>
                   <th className="py-3 px-4 text-left">วันที่เช็คอิน</th>
                   <th className="py-3 px-4 text-left">วันที่เช็คเอาท์</th>
+                  <th className="py-3 px-4 text-left">ราคาที่พัก</th>
                   <th className="py-3 px-4 text-center">การจัดการ</th>
                 </tr>
               </thead>
@@ -146,6 +151,9 @@ const chartData = Object.entries(roomBookingCount)
                     </td>
                     <td className="py-3 px-4">
                       {booking.check_out_date ? new Date(booking.check_out_date).toLocaleDateString() : "ไม่ระบุ"}
+                    </td>
+                    <td className="py-3 px-4">
+                      {calculateTotalPrice(booking.check_in_date, booking.check_out_date, booking.price_per_night)} บาท
                     </td>
                     <td className="py-3 px-4 flex justify-center space-x-2">
                       <Link
@@ -190,10 +198,10 @@ const chartData = Object.entries(roomBookingCount)
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="room" label={{ value: 'หมายเลขห้อง', position: 'insideBottom', dy: 10 }} />
-            <YAxis label={{ value: 'จำนวนการจอง', angle: -90, position: 'insideLeft' }} />
+            <XAxis dataKey="room" />
+            <YAxis />
             <Tooltip />
-            <Bar dataKey="count" fill="#8884d8" barSize={40} />
+            <Bar dataKey="count" fill="#8884d8" />
           </BarChart>
         </ResponsiveContainer>
       </div>

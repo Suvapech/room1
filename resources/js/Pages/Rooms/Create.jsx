@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Swal from 'sweetalert2';
+import { QRCodeCanvas } from 'qrcode.react'; // ✅ นำเข้า QRCodeCanvas
 
 export default function Create({ rooms }) {
   const { data, setData, post, errors } = useForm({
@@ -21,22 +22,27 @@ export default function Create({ rooms }) {
   // ใช้ Set เพื่อกรองห้องที่ไม่ซ้ำ
   const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
     .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
-
+    
   const handleSubmit = (e) => {
-    e.preventDefault();
 
-    console.log("Data sent to backend:", data); // 🛠 ตรวจสอบค่าที่ถูกส่ง
+    e.preventDefault();
 
     post('/bookings', {
       onSuccess: () => {
+        const paymentURL = `https://quickchart.io/qr?text=https://example.com/payment&size=200`;
+
         Swal.fire({
-          icon: 'success',
           title: 'การจองสำเร็จ',
-          text: 'การจองของคุณถูกบันทึกแล้ว',
+          html: `
+            <p>กรุณาชำระเงินจำนวน <strong>4,500 บาท</strong></p>
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+              <img src="${paymentURL}" alt="QR Code" width="200" height="200" />
+            </div>
+          `,
+          confirmButtonText: 'เสร็จสิ้น',
         });
       },
       onError: (errors) => {
-        console.error("Error response:", errors);
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
@@ -49,11 +55,11 @@ export default function Create({ rooms }) {
   return (
     <AuthenticatedLayout>
       <div className="p-8 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">เพิ่มการจองที่พัก</h1>
+        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">Create Booking</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">ชื่อของลูกค้า</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Customer Name</label>
             <input
               type="text"
               value={data.customer_name}
@@ -64,7 +70,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">เบอร์โทร</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Customer Phone</label>
             <input
               type="text"
               value={data.customer_phone}
@@ -75,25 +81,24 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Room Number</label>
             <select
               value={data.room_id || ''}
               onChange={(e) => setData('room_id', e.target.value)}
               className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value="">-- เลือกหมายเลขห้อง --</option>
-              {uniqueRooms.map((room) => (
+              {availableRooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   {room.room_number}
                 </option>
               ))}
             </select>
-
             {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">วันที่เช็คอิน</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Check-in Date</label>
             <input
               type="date"
               value={data.check_in_date}
@@ -105,7 +110,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">วันที่เช็คเอาท์</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">Check-out Date</label>
             <input
               type="date"
               value={data.check_out_date}
