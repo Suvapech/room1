@@ -77,6 +77,13 @@ export default function Index() {
     return diffInDays * pricePerNight;
   };
 
+  const totalAmount = filteredBookings.reduce((sum, booking) => {
+    if (booking.check_in_date && booking.check_out_date) {
+      return sum + calculateTotalPrice(booking.check_in_date, booking.check_out_date, booking.room_price);
+    }
+    return sum;
+  }, 0);  
+
   return (
     <AuthenticatedLayout>
       <div className="container mx-auto p-8 bg-white shadow-xl rounded-lg border border-gray-200">
@@ -156,6 +163,10 @@ export default function Index() {
         ) : (
           <p className="text-center py-6 text-gray-500">ไม่มีข้อมูลการจอง</p>
         )}
+<div className="flex justify-between bg-gray-200 p-4 rounded-lg mt-4">
+  <h3 className="text-lg font-semibold">ยอดรวมการจอง: {filteredBookings.length} รายการ</h3>
+  <h3 className="text-lg font-semibold">ราคารวมทั้งหมด: {totalAmount.toLocaleString()} บาท</h3>
+</div>
 
         <div className="flex justify-center space-x-4 mt-6">
           <button
