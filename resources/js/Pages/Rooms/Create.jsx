@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Swal from 'sweetalert2';
 import { QRCodeCanvas } from 'qrcode.react';
 
-export default function Create({ rooms }) {
+export default function Create({ rooms, existingBookings }) {
   const { data, setData, post, errors } = useForm({
     customer_name: '',
     customer_phone: '',
@@ -27,45 +27,77 @@ export default function Create({ rooms }) {
     }
   }, [data.check_in_date, data.check_out_date]);
 
-  // กรองห้องที่ไม่ซ้ำกัน โดยใช้ Set เพื่อไม่ให้แสดงห้องซ้ำ
   const availableRooms = rooms
     .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
     .sort((a, b) => {
+      const getLetter = (room) => room.room_number.charAt(0);
       const getNumber = (room) => parseInt(room.room_number.slice(1), 10);
-      return getNumber(a) - getNumber(b);
+
+      if (getLetter(a) === getLetter(b)) {
+        return getNumber(a) - getNumber(b);
+      }
+      return getLetter(a).localeCompare(getLetter(b));
     });
 
-  // ใช้ Set เพื่อกรองห้องที่ไม่ซ้ำ
   const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
     .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    post('/bookings', {
-      onSuccess: () => {
-        const paymentURL = `https://promptpay.io/0832654075/${totalPrice}`;
-
-        Swal.fire({
-          title: 'การจองสำเร็จ',
-          html: `
-            <p>กรุณาชำระเงินจำนวน <strong>${totalPrice.toLocaleString()} บาท</strong></p>
-            <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentURL)}&size=200x200" alt="QR Code" />
-            </div>
-          `,
-          confirmButtonText: 'เสร็จสิ้น',
-        });
-      },
-      onError: (errors) => {
+    const handleSubmit = (e) => {
+      e.preventDefault();
+    
+      if (!rooms || !Array.isArray(rooms)) {
+        console.error("Rooms data is undefined or not an array.");
+        return;
+      }
+    
+      const checkInDate = new Date(data.check_in_date);
+      const checkOutDate = new Date(data.check_out_date);
+    
+      // ตรวจสอบว่าห้องนี้ถูกจองในช่วงวันนั้นๆ แล้วหรือไม่
+      const isRoomBooked = rooms.some(room => 
+        room.id === data.room_id &&
+        room.status === 'reserved' &&
+        (
+          (new Date(room.check_in_date) <= checkOutDate && new Date(room.check_out_date) >= checkInDate)
+        )
+      );      
+    
+      if (isRoomBooked) {
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: errors.room_id || errors.message || 'กรุณาลองใหม่อีกครั้ง',
+          text: 'ห้องนี้ถูกจองไปแล้วในช่วงเวลาที่คุณเลือก กรุณาเลือกห้องอื่น',
         });
-      },
-    });
-  };
+        return;
+      }
+      
+    
+      // ส่งข้อมูลการจองไปยังเซิร์ฟเวอร์
+      post('/bookings', {
+        onSuccess: () => {
+          const paymentURL = `https://promptpay.io/0832654075/${totalPrice}`;
+    
+          Swal.fire({
+            title: 'การจองสำเร็จ',
+            html: `
+              <p>กรุณาชำระเงินจำนวน <strong>${totalPrice.toLocaleString()} บาท</strong></p>
+              <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentURL)}&size=200x200" alt="QR Code" />
+              </div>
+            `,
+            confirmButtonText: 'เสร็จสิ้น',
+          });
+        },
+        onError: (errors) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: errors.room_id || errors.message || 'กรุณาลองใหม่อีกครั้ง',
+          });
+        },
+      });
+    };
+    
 
   return (
     <AuthenticatedLayout>

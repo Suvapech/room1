@@ -30,7 +30,7 @@ Route::delete('/rooms/{id}', [RoomController::class, 'destroy'])->name('rooms.de
 
 Route::get('/rooms/available', [RoomController::class, 'availableRooms'])->name('rooms.available');
 
-Route::get('/dashboard', function () {  
+Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
