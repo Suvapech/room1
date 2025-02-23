@@ -69,7 +69,7 @@ export default function Create({ rooms }) {
   return (
     <AuthenticatedLayout>
       <div className="p-8 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg shadow-lg max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">Create Booking</h1>
+        <h1 className="text-3xl font-bold text-center text-black-700 mb-6">เพิ่มข้อมูลการจอง</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -84,7 +84,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Customer Phone</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">เบอร์โทร</label>
             <input
               type="text"
               value={data.customer_phone}
@@ -95,7 +95,7 @@ export default function Create({ rooms }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">Room Number</label>
+            <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
             <select
               value={data.room_id || ''}
               onChange={(e) => setData('room_id', e.target.value)}
