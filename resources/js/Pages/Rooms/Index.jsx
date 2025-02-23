@@ -8,6 +8,8 @@ export default function Index() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredBookings, setFilteredBookings] = useState(bookings);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -37,13 +39,12 @@ export default function Index() {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-  
     const filtered = bookings.filter(booking =>
       [booking.customer_name, booking.customer_phone, booking.room_number]
         .some(field => field?.toLowerCase().includes(e.target.value.toLowerCase()))
     );
     setFilteredBookings(filtered);
-  };  
+  };
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -82,7 +83,20 @@ export default function Index() {
       return sum + calculateTotalPrice(booking.check_in_date, booking.check_out_date, booking.room_price);
     }
     return sum;
-  }, 0);  
+  }, 0);
+
+  // ฟังก์ชันสำหรับกรองการจองตามวันที่เริ่มต้นและวันที่สิ้นสุด
+  const handleDateFilter = () => {
+    const filtered = bookings.filter(booking => {
+      const checkInDate = new Date(booking.check_in_date);
+      const checkOutDate = new Date(booking.check_out_date);
+      const isWithinDateRange =
+        (!startDate || checkInDate >= new Date(startDate)) &&
+        (!endDate || checkOutDate <= new Date(endDate));
+      return isWithinDateRange;
+    });
+    setFilteredBookings(filtered);
+  };
 
   return (
     <AuthenticatedLayout>
@@ -163,10 +177,31 @@ export default function Index() {
         ) : (
           <p className="text-center py-6 text-gray-500">ไม่มีข้อมูลการจอง</p>
         )}
-<div className="flex justify-between bg-gray-200 p-4 rounded-lg mt-4">
-  <h3 className="text-lg font-semibold">ยอดรวมการจอง: {filteredBookings.length} รายการ</h3>
-  <h3 className="text-lg font-semibold">ราคารวมทั้งหมด: {totalAmount.toLocaleString()} บาท</h3>
-</div>
+        <div className="flex justify-center space-x-4 mb-6">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleDateFilter}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+          >
+            กรอง
+          </button>
+        </div>
+
+        <div className="flex justify-between bg-gray-200 p-4 rounded-lg mt-4">
+          <h3 className="text-lg font-semibold">ยอดรวมการจอง: {filteredBookings.length} รายการ</h3>
+          <h3 className="text-lg font-semibold">ราคารวมทั้งหมด: {totalAmount.toLocaleString()} บาท</h3>
+        </div>
 
         <div className="flex justify-center space-x-4 mt-6">
           <button

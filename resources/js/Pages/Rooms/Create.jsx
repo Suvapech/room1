@@ -27,6 +27,7 @@ export default function Create({ rooms }) {
     }
   }, [data.check_in_date, data.check_out_date]);
 
+  // กรองห้องที่ไม่ซ้ำกัน โดยใช้ Set เพื่อไม่ให้แสดงห้องซ้ำ
   const availableRooms = rooms
     .filter((room) => room.status === 'not_reserved' && /^([AB]10?|A[1-9]|B[1-9])$/.test(room.room_number))
     .sort((a, b) => {
@@ -102,7 +103,7 @@ export default function Create({ rooms }) {
               className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value="">-- เลือกหมายเลขห้อง --</option>
-              {availableRooms.map((room) => (
+              {uniqueRooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   {room.room_number}
                 </option>

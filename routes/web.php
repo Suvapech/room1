@@ -28,6 +28,7 @@ Route::put('/rooms/{id}', [RoomController::class, 'update'])->name('rooms.update
 
 Route::delete('/rooms/{id}', [RoomController::class, 'destroy'])->name('rooms.destroy');
 
+Route::get('/rooms/available', [RoomController::class, 'availableRooms'])->name('rooms.available');
 
 Route::get('/dashboard', function () {  
     return Inertia::render('Dashboard');

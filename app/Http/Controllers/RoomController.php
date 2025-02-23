@@ -142,4 +142,16 @@ class RoomController extends Controller
 
         return redirect()->route('rooms.index')->with('success', 'ลบการจองสำเร็จแล้ว');
     }
+
+    public function availableRooms()
+    {
+        // ดึงข้อมูลห้องที่มีสถานะเป็น 'available'
+        $rooms = Room::where('status', 'available')->get();
+
+        // ส่งข้อมูลไปยัง view หรือ component ของคุณ (ใช้ Inertia หรือ Blade ตามที่ต้องการ)
+        return inertia('AvailableRooms', [
+            'rooms' => $rooms
+        ]);
+    }
 }
+
