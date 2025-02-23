@@ -73,28 +73,28 @@ export default function Edit() {
             {errors.customer_phone && <p className="text-red-500 text-sm">{errors.customer_phone}</p>}
           </div>
           <div>
-  <label className="block text-lg font-medium mb-2">เลือกห้อง</label>
-  <select
-    name="room_id"
-    value={formData.room_id}
-    onChange={handleChange}
-    className={`w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.room_id ? 'border-red-500' : ''}`}
-  >
-    {rooms
-      .map((room) => room.room_number) // เลือกเลขห้อง
-      .filter((value, index, self) => self.indexOf(value) === index) // กรองห้องที่ซ้ำ
-      .sort() // เรียงลำดับ
-      .map((roomNumber) => {
-        const room = rooms.find((r) => r.room_number === roomNumber);
-        return (
-          <option key={room.id} value={room.id}>
-            ห้อง {room.room_number} ({room.status})
-          </option>
-        );
-      })}
-  </select>
-  {errors.room_id && <p className="text-red-500 text-sm">{errors.room_id}</p>}
-</div>
+            <label className="block text-lg font-medium mb-2">เลือกห้อง</label>
+            <select
+              name="room_id"
+              value={formData.room_id}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.room_id ? 'border-red-500' : ''}`}
+            >
+              {rooms
+                .map((room) => room.room_number) // เลือกเลขห้อง
+                .filter((value, index, self) => self.indexOf(value) === index) // กรองห้องที่ซ้ำ
+                .sort() // เรียงลำดับ
+                .map((roomNumber) => {
+                  const room = rooms.find((r) => r.room_number === roomNumber);
+                  return (
+                    <option key={room.id} value={room.id}>
+                      ห้อง {room.room_number} ({room.status})
+                    </option>
+                  );
+                })}
+            </select>
+            {errors.room_id && <p className="text-red-500 text-sm">{errors.room_id}</p>}
+          </div>
 
           <div>
             <label className="block text-lg font-medium mb-2">วันที่เช็คอิน</label>
