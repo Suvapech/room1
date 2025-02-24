@@ -18,6 +18,19 @@ export default function Index() {
     setFilteredBookings(updatedBookings);
   }, [bookings]);
 
+  useEffect(() => {
+    // ฟังก์ชันกรองข้อมูลเมื่อวันที่เริ่มต้นหรือวันที่สิ้นสุดเปลี่ยน
+    const filtered = bookings.filter(booking => {
+      const checkInDate = new Date(booking.check_in_date);
+      const checkOutDate = new Date(booking.check_out_date);
+      const isWithinDateRange =
+        (!startDate || checkInDate >= new Date(startDate)) &&
+        (!endDate || checkOutDate <= new Date(endDate));
+      return isWithinDateRange;
+    });
+    setFilteredBookings(filtered);
+  }, [startDate, endDate, bookings]); // กรองข้อมูลใหม่เมื่อ startDate หรือ endDate เปลี่ยนแปลง
+
   const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
 
   const sortedBookings = [...filteredBookings].sort((a, b) => {
@@ -47,7 +60,6 @@ export default function Index() {
     );
     setFilteredBookings(filtered);
   };
-  
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -87,19 +99,6 @@ export default function Index() {
     }
     return sum;
   }, 0);
-
-  // ฟังก์ชันสำหรับกรองการจองตามวันที่เริ่มต้นและวันที่สิ้นสุด
-  const handleDateFilter = () => {
-    const filtered = bookings.filter(booking => {
-      const checkInDate = new Date(booking.check_in_date);
-      const checkOutDate = new Date(booking.check_out_date);
-      const isWithinDateRange =
-        (!startDate || checkInDate >= new Date(startDate)) &&
-        (!endDate || checkOutDate <= new Date(endDate));
-      return isWithinDateRange;
-    });
-    setFilteredBookings(filtered);
-  };
 
   return (
     <AuthenticatedLayout>
@@ -180,6 +179,7 @@ export default function Index() {
         ) : (
           <p className="text-center py-6 text-gray-500">ไม่มีข้อมูลการจอง</p>
         )}
+
         <div className="flex justify-center space-x-4 mb-6">
           <input
             type="date"
@@ -193,12 +193,6 @@ export default function Index() {
             onChange={(e) => setEndDate(e.target.value)}
             className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button
-            onClick={handleDateFilter}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-          >
-            กรอง
-          </button>
         </div>
 
         <div className="flex justify-between bg-gray-200 p-4 rounded-lg mt-4">

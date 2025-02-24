@@ -24,7 +24,8 @@ const rooms = [
         location: "เชียงใหม่, ไทย",
         rating: 9.4,
         reviews: 12,
-        image: "/images/room3.jpg",
+        image: 
+                "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/00/43/9b/b2-chang-phueak-gate.jpg?w=1200&h=-1&s=1",
         type: "villa"
     },
     {
