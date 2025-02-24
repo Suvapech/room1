@@ -145,12 +145,19 @@ class RoomController extends Controller
 
     public function availableRooms()
     {
-        // ดึงข้อมูลห้องที่มีสถานะเป็น 'available'
-        $rooms = Room::where('status', 'available')->get();
+        // ดึงเฉพาะห้องที่สามารถจองได้ (status = 'not_reserved')
+        $rooms = Room::where('status', 'not_reserved')
+            ->get()
+            ->map(function ($room) {
+                // ตรวจสอบว่า price_per_night มีค่า ถ้าไม่มีให้กำหนดเป็น 0
+                $room->price_per_night = $room->price_per_night ?? 0;
+                return $room;
+            });
 
-        // ส่งข้อมูลไปยัง view หรือ component ของคุณ (ใช้ Inertia หรือ Blade ตามที่ต้องการ)
-        return inertia('AvailableRooms', [
+        // ส่งข้อมูลไปยัง Inertia
+        return Inertia::render('AvailableRooms', [
             'rooms' => $rooms
         ]);
-    }
+}
+
 }
