@@ -34,6 +34,26 @@ const rooms = [
         type: "Sigle"
     },
     {
+        name: "A4",
+        rating: 7.0,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144470844.jpg?k=5080c3a0e74a04bcf06a1a05b0f79c9a6471208a22946ddf7a969fe62ffd6cdd&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144470681.jpg?k=985423ce89acc30648f19db1e8ca1a9483584ca99591303cf00cfa5972d683a9&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144472473.jpg?k=c9bd509b141a3b2b47b7d2dd05424f4c7ccd2008c3a5ff4dec21ded4467cd907&o=&hp=1",
+        ],
+        type: "Sigle"
+    },
+    {
+        name: "A5",
+        rating: 9.0,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144470836.jpg?k=d1e40b763a41867828256ab29bc2f7cee338eaf54b179bb997e711a367720c79&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144474578.jpg?k=da154d425c2e41a763277f7b4e671216a429759c4fa94ecbbae8449e7679863e&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144471511.jpg?k=91117eee471481d2db2556861d49aee3403036710f74a29f5ef68d6432ecd179&o=&hp=1",
+        ],
+        type: "Double"
+    },
+    {
         name: "The Corner's unique house",
         location: "เชียงใหม่, ไทย",
         rating: 9.7,
@@ -174,29 +194,39 @@ export default function RoomRecommendation() {
                         ))}
                     </div>
 
-                    {/* Modal for Image Viewing */}
                     {modalVisible && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                            <div className="relative bg-white p-6 rounded-lg">
+                            <div className="relative bg-white p-8 rounded-xl shadow-2xl w-[90%] max-w-2xl">
+                                {/* ปุ่มปิดโมดอล */}
                                 <button
                                     onClick={closeModal}
-                                    className="absolute top-0 right-0 p-4 text-white bg-red-600 rounded-full"
+                                    className="absolute top-3 right-3 p-3 text-white bg-red-500 hover:bg-red-700 transition-all rounded-full shadow-md"
                                 >
-                                    X
+                                    ✕
                                 </button>
-                                <div className="flex items-center justify-between">
+
+                                <div className="flex items-center justify-center space-x-6">
+                                    {/* ปุ่ม Prev */}
                                     <button
                                         onClick={() => navigateImages(-1)}
-                                        className="px-4 py-2 text-white bg-blue-500 rounded-lg"
+                                        className="px-5 py-3 text-white hover:bg-blue-700 transition-all rounded-lg shadow-md"
                                     >
-                                        Prev
+                                        ◀
                                     </button>
-                                    <img src={modalImages[modalImageIndex]} alt="Room" className="max-w-full max-h-96 object-contain" />
+
+                                    {/* รูปภาพ */}
+                                    <img
+                                        src={modalImages[modalImageIndex]}
+                                        alt="Room"
+                                        className="max-w-full max-h-96 object-contain rounded-lg shadow-md"
+                                    />
+
+                                    {/* ปุ่ม Next */}
                                     <button
                                         onClick={() => navigateImages(1)}
-                                        className="px-4 py-2 text-white bg-blue-500 rounded-lg"
+                                        className="px-5 py-3 text-white hover:bg-blue-700 transition-all rounded-lg shadow-md"
                                     >
-                                        Next
+                                        ▶
                                     </button>
                                 </div>
                             </div>
@@ -210,23 +240,57 @@ export default function RoomRecommendation() {
                         <p className="text-lg">ที่อยู่: <span className="text-blue-500">123 ถนนตัวอย่าง, เชียงใหม่, ไทย</span></p>
                     </div>
 
-                    <div className="mt-8 p-6 bg-white shadow-md rounded-lg">
-                        <h3 className="text-2xl font-semibold mb-4">แสดงความคิดเห็น</h3>
+                    <div className="mt-8 p-6 bg-white shadow-sm rounded-lg">
+                        <h3 className="text-lg font-semibold mb-4">แสดงความคิดเห็น</h3>
                         <form onSubmit={handleReviewSubmit}>
                             <textarea
-                                className="w-full p-3 border-2 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                rows="4"
+                                className="w-full p-2 border rounded-lg"
+                                rows="3"
                                 placeholder="เขียนความคิดเห็นของคุณที่นี่..."
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                             ></textarea>
                             <button
                                 type="submit"
-                                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
                             >
                                 {editingIndex !== null ? "อัปเดตความคิดเห็น" : "ส่งความคิดเห็น"}
                             </button>
                         </form>
+                        <div className="mt-4">
+                            <h4 className="text-md font-semibold">ความคิดเห็นล่าสุด</h4>
+                            <ul className="mt-2 space-y-2">
+                                {reviews.map((review, index) => (
+                                    <li key={index} className="p-2 bg-gray-100 rounded-lg flex justify-between items-center relative">
+                                        <span>{review}</span>
+                                        <div>
+                                            <button 
+                                                className="ml-4 px-2 py-1 bg-gray-300 rounded-lg"
+                                                onClick={() => setDropdownIndex(dropdownIndex === index ? null : index)}
+                                            >
+                                                ⋮
+                                            </button>
+                                            {dropdownIndex === index && (
+                                                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg z-50">
+                                                    <button
+                                                        onClick={() => handleEditReview(index)}
+                                                        className="block w-full px-4 py-2 text-left hover:bg-gray-200"
+                                                    >
+                                                        แก้ไข
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteReview(index)}
+                                                        className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-200"
+                                                    >
+                                                        ลบ
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
