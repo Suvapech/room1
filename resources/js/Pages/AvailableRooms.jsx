@@ -36,18 +36,54 @@ export default function AvailableRooms() {
       alert('กรุณาเลือกวันที่ Check-in และ Check-out');
       return;
     }
-
-    const filtered = availableRooms.filter(room => {
-      const roomAvailableFrom = new Date(room.available_from);
-      const roomAvailableTo = new Date(room.available_to);
+  
+    console.log("🔍 วันที่ที่เลือก:", checkInDate, checkOutDate);
+    console.log("📦 ข้อมูลห้องที่ได้จาก API:", rooms);
+  
+    const checkValidDate = (dateString) => {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime());
+    };
+  
+    let filteredRooms = rooms.filter((room) => {
+      const availableFrom = checkValidDate(room.available_from) ? new Date(room.available_from) : new Date();
+      const availableTo = checkValidDate(room.available_to) ? new Date(room.available_to) : new Date();
+  
+      if (!checkValidDate(room.available_from) || !checkValidDate(room.available_to)) {
+        console.log(`ห้อง ${room.room_number} ไม่มีวันที่ที่ไม่มีการจอง`);
+        return true;
+      }
+  
       const checkIn = new Date(checkInDate);
       const checkOut = new Date(checkOutDate);
-
-      return roomAvailableFrom <= checkIn && roomAvailableTo >= checkOut;
+  
+      return availableFrom <= checkIn && availableTo >= checkOut;
     });
-
-    setFilteredRooms(filtered);
-  };
+  
+    // กำจัดห้องซ้ำ โดยใช้ Map เก็บ room_number ที่ไม่ซ้ำกัน
+    const uniqueRoomsMap = new Map();
+    filteredRooms.forEach(room => {
+      if (!uniqueRoomsMap.has(room.room_number)) {
+        uniqueRoomsMap.set(room.room_number, room);
+      }
+    });
+  
+    filteredRooms = Array.from(uniqueRoomsMap.values());
+  
+    // เรียงลำดับห้องตามตัวอักษร + ตัวเลข
+    filteredRooms.sort((a, b) => {
+      const getLetter = room => room.room_number.match(/[A-Za-z]+/)[0]; // ดึงตัวอักษร
+      const getNumber = room => parseInt(room.room_number.match(/\d+/)[0], 10); // ดึงตัวเลข
+  
+      if (getLetter(a) === getLetter(b)) {
+        return getNumber(a) - getNumber(b);
+      }
+      return getLetter(a).localeCompare(getLetter(b));
+    });
+  
+    console.log("✅ ห้องที่ผ่านการกรอง (เรียงลำดับแล้ว):", filteredRooms);
+    setAvailableRooms(filteredRooms);
+  };  
 
   return (
     <AuthenticatedLayout>

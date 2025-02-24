@@ -143,21 +143,34 @@ class RoomController extends Controller
         return redirect()->route('rooms.index')->with('success', 'ลบการจองสำเร็จแล้ว');
     }
 
-    public function availableRooms()
+    public function availableRooms(Request $request)
     {
-        // ดึงเฉพาะห้องที่สามารถจองได้ (status = 'not_reserved')
-        $rooms = Room::where('status', 'not_reserved')
-            ->get()
-            ->map(function ($room) {
-                // ตรวจสอบว่า price_per_night มีค่า ถ้าไม่มีให้กำหนดเป็น 0
-                $room->price_per_night = $room->price_per_night ?? 0;
-                return $room;
-            });
+        $checkIn = $request->query('check_in_date');
+        $checkOut = $request->query('check_out_date');
+    
+        if (!$checkIn || !$checkOut) {
+            $rooms = Room::where('status', 'not_reserved')->get();
+            return Inertia::render('AvailableRooms', ['rooms' => $rooms]);
+        }
+    
+        \Log::info("🔍 ค้นหาห้องที่พร้อมใช้งาน", ['check_in' => $checkIn, 'check_out' => $checkOut]);
 
-        // ส่งข้อมูลไปยัง Inertia
-        return Inertia::render('AvailableRooms', [
-            'rooms' => $rooms
-        ]);
-}
+        $rooms = Room::with('bookings')
+            ->whereDoesntHave('bookings', function ($query) use ($checkIn, $checkOut) {
+                $query->where(function ($q) use ($checkIn, $checkOut) {
+                    $q->whereBetween('check_in_date', [$checkIn, $checkOut])
+                      ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                      ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                          $q->where('check_in_date', '<', $checkIn)
+                            ->where('check_out_date', '>', $checkOut);
+                      });
+                });
+            })
+            ->where('status', 'not_reserved')
+            ->get();
 
+        \Log::info("✅ ห้องที่พร้อมใช้งาน:", $rooms->toArray());
+
+        return response()->json(['rooms' => $rooms]);
+    }
 }

@@ -127,21 +127,22 @@ export default function Create({ rooms, existingBookings }) {
           </div>
 
           <div>
-            <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
-            <select
-              value={data.room_id || ''}
-              onChange={(e) => setData('room_id', e.target.value)}
-              className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="">-- เลือกหมายเลขห้อง --</option>
-              {uniqueRooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.room_number}
-                </option>
-              ))}
-            </select>
-            {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
-          </div>
+  <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
+  <select
+    value={data.room_id || ''}
+    onChange={(e) => setData('room_id', e.target.value)}
+    className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+  >
+    <option value="">-- เลือกหมายเลขห้อง --</option>
+    {uniqueRooms.map((room) => (
+      <option key={room.id} value={room.id}>
+        {room.room_number} - {room.status === 'reserved' ? 'ถูกจอง' : 'not_reserved'}
+      </option>
+    ))}
+  </select>
+  {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
+</div>
+
 
           <div>
             <label className="block mb-2 text-lg font-medium text-gray-700">Check-in Date</label>
