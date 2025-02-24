@@ -97,7 +97,6 @@ export default function Create({ rooms, existingBookings }) {
         },
       });
     };
-    
 
   return (
     <AuthenticatedLayout>

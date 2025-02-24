@@ -52,9 +52,8 @@ export default function Index() {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    const deletedBookings = JSON.parse(localStorage.getItem('deletedBookings')) || [];
+
     const filtered = bookings.filter(booking =>
-      !deletedBookings.includes(booking.id) && // ตรวจสอบว่าไม่ได้ถูกลบ
       [booking.customer_name, booking.customer_phone, booking.room_number]
         .some(field => field?.toLowerCase().includes(e.target.value.toLowerCase()))
     );
