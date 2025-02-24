@@ -112,12 +112,20 @@ export default function Index() {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Link
-            href="/rooms/create"
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600"
-          >
-            เพิ่มข้อมูลการจอง
-          </Link>
+          <div className="flex justify-center space-x-4 mb-6">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         </div>
 
         {currentBookings.length > 0 ? (
@@ -178,21 +186,6 @@ export default function Index() {
         ) : (
           <p className="text-center py-6 text-gray-500">ไม่มีข้อมูลการจอง</p>
         )}
-
-        <div className="flex justify-center space-x-4 mb-6">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border px-4 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
 
         <div className="flex justify-between bg-gray-200 p-4 rounded-lg mt-4">
           <h3 className="text-lg font-semibold">ยอดรวมการจอง: {filteredBookings.length} รายการ</h3>

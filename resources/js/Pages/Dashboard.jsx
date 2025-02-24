@@ -54,33 +54,80 @@ const rooms = [
         type: "Double"
     },
     {
-        name: "The Corner's unique house",
-        location: "เชียงใหม่, ไทย",
-        rating: 9.7,
-        reviews: 18,
-        image: "/images/room2.jpg",
+        name: "A6",
+        rating: 9.4,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734361.jpg?k=562a6eee0e60bae663d4680449044284f80e0426812a2c820de662d96951cf1d&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734363.jpg?k=67fabb54cac6411eb34039b8e98a75dccca8635b1c0a04f8759531eb157ab542&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734382.jpg?k=036350d74c42bc065eb8d5a7d25ac6e83a58f0583cb2d660206ea2a13c23fd07&o=&hp=1",
+        ],
         type: "Double"
     },
     {
-        name: "Villa Rajapruek Entire 3 villa with pool near Airport and city center",
-        location: "เชียงใหม่, ไทย",
-        rating: 9.4,
-        reviews: 12,
+        name: "B1",
+        rating: 7.9,
         image: [
-            "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/00/43/9f/b2-chang-phueak-gate.jpg?w=1200&h=-1&s=1",
-            "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/00/43/9c/deluxe-premier-room.jpg?w=1200&h=-1&s=1",
-            "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/00/43/9b/b2-chang-phueak-gate.jpg?w=1200&h=-1&s=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734385.jpg?k=7bcc9b1ce932cc187bbc0878d9159efc2c4f04297d529926efceaafc204120e9&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734360.jpg?k=382e587087c200098d4a640e4bc5bb35001ba2bdf0d494dd07f83e66e2c9a9ce&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734335.jpg?k=460d54bb67fc89a92ae813c4789edc5b5be13444f50b53d44e69d49e1cf3a776&o=&hp=1",
         ],
-        type: "villa"
+        type: "Double"
     },
     {
-        name: "Villa 89 Nimman Chiang Mai",
-        location: "เชียงใหม่, ไทย",
+        name: "B2",
+        rating: 7.9,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734341.jpg?k=9464ddf34c798aa1b56be0aca9c7b85313c09053be6a7addb862cfb55ec3f256&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734333.jpg?k=b2dfa0e9f45cacd5a59fbf4cf5df5af85f33804918e0f90e5a85a7f914fdc924&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/122734326.jpg?k=6a64d11f382d4a9d6ea12dab057df76553cd153241acdf4015b874522e2e198e&o=&hp=1",
+        ],
+        type: "Double"
+    },
+    {
+        name: "B3",
         rating: 9.3,
-        reviews: 12,
-        image: "/images/room4.jpg",
+        reviews: 10,
+        image: [
+            "https://blog.amari.com/wp-content/uploads/2020/01/executive-suite-1.jpg",
+            "https://blog.amari.com/wp-content/uploads/2020/01/executive-one-bedroom-suite-river-view_living-and-dining-area-1.jpg",
+            "https://blog.amari.com/wp-content/uploads/2020/01/executive-suite-ocean-view-2.jpg",
+        ],
         type: "Sweet"
-    }
+    },
+    {
+        name: "B4",
+        rating: 9.3,
+        reviews: 10,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/84096051.jpg?k=232d0d8cfeba2539635fa681e6facb641e3223cef918c22100adf0de4fe2aa16&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/166800332.jpg?k=7ea16ac5b8552489e0c2bf5aa884046fd5f201e2fbbe870260476f6a828d9aab&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/84096036.jpg?k=c61582b354850e4a378e964aaead31402347af5f0e87d553280bfe586fb32a3f&o=&hp=1",
+        ],
+        type: "Sweet"
+    },
+    {
+        name: "B5",
+        rating: 9.3,
+        reviews: 10,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173708.jpg?k=5cb3ee90a8f58e73a2983692a1dba2b1d460ff9f3e0da0eca07268da5480f0a5&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173712.jpg?k=c0272292c742273a072bf64b654128ae062924c6c5d2b800758e13f64bb62374&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173701.jpg?k=5946532343c46af5b2908dd132d1aaec9ee6fad3115c593a0a9167e9185ef8a7&o=&hp=1",
+        ],
+        type: "Sweet"
+    },
+    {
+        name: "B6",
+        rating: 9.3,
+        reviews: 10,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173706.jpg?k=bc6d83cf5fc3ecf88d2a49ec6befd4b09c954b358834c684759ca7547a2008ff&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173705.jpg?k=789b85cabd34a21df87eaf27bded6ac1488698b6de065e8de11c0a29aa35eef8&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/372173781.jpg?k=1b7605e2380811fb4d302d02d8ea8f9a21914861b0d15b49db66f5e157425a20&o=&hp=1",
+        ],
+        type: "Sweet"
+    },
+
 ];
 
 export default function RoomRecommendation() {
@@ -159,7 +206,7 @@ export default function RoomRecommendation() {
 
             <div className="py-12 bg-gray-50">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <h3 className="text-2xl font-semibold mb-4">ยังสนใจที่พักเหล่านี้อยู่ใช่ไหม?</h3>
+                    <h3 className="text-2xl font-semibold mb-4">คุณสนใจเปิดม่านรูดที่รู้ใจคุณไหม?</h3>
 
                     <div className="mb-6">
                         <label htmlFor="room-type" className="mr-2 text-lg font-medium">เลือกประเภทห้องพัก</label>
@@ -257,40 +304,43 @@ export default function RoomRecommendation() {
                                 {editingIndex !== null ? "อัปเดตความคิดเห็น" : "ส่งความคิดเห็น"}
                             </button>
                         </form>
-                        <div className="mt-4">
-                            <h4 className="text-md font-semibold">ความคิดเห็นล่าสุด</h4>
-                            <ul className="mt-2 space-y-2">
-                                {reviews.map((review, index) => (
-                                    <li key={index} className="p-2 bg-gray-100 rounded-lg flex justify-between items-center relative">
-                                        <span>{review}</span>
-                                        <div>
-                                            <button 
-                                                className="ml-4 px-2 py-1 bg-gray-300 rounded-lg"
-                                                onClick={() => setDropdownIndex(dropdownIndex === index ? null : index)}
-                                            >
-                                                ⋮
-                                            </button>
-                                            {dropdownIndex === index && (
-                                                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg z-50">
-                                                    <button
-                                                        onClick={() => handleEditReview(index)}
-                                                        className="block w-full px-4 py-2 text-left hover:bg-gray-200"
-                                                    >
-                                                        แก้ไข
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteReview(index)}
-                                                        className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-200"
-                                                    >
-                                                        ลบ
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        {reviews.length > 0 && (
+                            <div className="mt-4">
+                                <h4 className="text-md font-semibold">ความคิดเห็นล่าสุด</h4>
+                                <ul className="mt-2 space-y-2">
+                                    {reviews.map((review, index) => (
+                                        <li key={index} className="p-2 bg-gray-100 rounded-lg flex justify-between items-center relative">
+                                            <span>{review}</span>
+                                            <div className="relative">
+                                                <button
+                                                    className="ml-4 px-2 py-1 bg-gray-300 rounded-lg"
+                                                    onClick={() => setDropdownIndex(dropdownIndex === index ? null : index)}
+                                                >
+                                                    ⋮
+                                                </button>
+                                                {dropdownIndex === index && (
+                                                    <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-lg z-50">
+                                                        <button
+                                                            onClick={() => handleEditReview(index)}
+                                                            className="block w-full px-4 py-2 text-left hover:bg-gray-200"
+                                                        >
+                                                            แก้ไข
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteReview(index)}
+                                                            className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-200"
+                                                        >
+                                                            ลบ
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </div>

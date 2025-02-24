@@ -5,6 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 export default function AvailableRooms() {
   const { rooms = [] } = usePage().props;
   const [availableRooms, setAvailableRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
 
@@ -27,6 +28,7 @@ export default function AvailableRooms() {
     });
 
     setAvailableRooms(sortedRooms);
+    setFilteredRooms(sortedRooms);
   }, [rooms]);
 
   const handleFilterByDate = () => {
@@ -35,7 +37,7 @@ export default function AvailableRooms() {
       return;
     }
 
-    const filteredRooms = availableRooms.filter(room => {
+    const filtered = availableRooms.filter(room => {
       const roomAvailableFrom = new Date(room.available_from);
       const roomAvailableTo = new Date(room.available_to);
       const checkIn = new Date(checkInDate);
@@ -44,7 +46,7 @@ export default function AvailableRooms() {
       return roomAvailableFrom <= checkIn && roomAvailableTo >= checkOut;
     });
 
-    setAvailableRooms(filteredRooms);
+    setFilteredRooms(filtered);
   };
 
   return (
@@ -80,7 +82,7 @@ export default function AvailableRooms() {
           </button>
         </div>
 
-        {availableRooms.length > 0 ? (
+        {filteredRooms.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white shadow-md rounded-lg border border-gray-200">
               <thead>
@@ -92,11 +94,13 @@ export default function AvailableRooms() {
                 </tr>
               </thead>
               <tbody>
-                {availableRooms.map((room, index) => (
+                {filteredRooms.map((room, index) => (
                   <tr key={index} className="border-b hover:bg-blue-100 odd:bg-gray-50">
                     <td className="py-3 px-4">{room.room_number}</td>
                     <td className="py-3 px-4 text-green-600">{room.status}</td>
-                    <td className="py-3 px-4">{(1000).toLocaleString()} บาท</td>
+                    <td className="py-3 px-4">
+                      {(room.price ?? 1000).toLocaleString()} บาท
+                    </td>
                     <td className="py-3 px-4">
                       <Link
                         href={`/rooms/${room.id}/details`}
@@ -108,10 +112,13 @@ export default function AvailableRooms() {
                   </tr>
                 ))}
               </tbody>
+
             </table>
           </div>
         ) : (
-          <p className="text-center py-6 text-gray-500">ไม่มีห้องว่าง</p>
+          <p className="text-center py-6 text-gray-500">
+            {checkInDate && checkOutDate ? "ไม่มีห้องว่างในช่วงเวลาที่เลือก" : "ไม่มีห้องว่าง"}
+          </p>
         )}
       </div>
     </AuthenticatedLayout>

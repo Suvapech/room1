@@ -37,6 +37,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Rooms
                                 </NavLink>
                                 <NavLink
+                                    href={route('rooms.create')}
+                                    active={route().current('rooms.create')}
+                                >
+                                    Create
+                                </NavLink>
+                                <NavLink
                                     href={route('rooms.available')}
                                     active={route().current('rooms.available')}
                                 >
