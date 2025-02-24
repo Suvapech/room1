@@ -24,6 +24,16 @@ const rooms = [
         type: "Sigle"
     },
     {
+        name: "A3",
+        rating: 8.0,
+        image: [
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144470675.jpg?k=dbd1b7902bed8f060cd3e478f8b748b7c2393c4aaafe579229b37485e6fb3271&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144471664.jpg?k=1d628a3fb512585fdda2ca34e4c5151405c196510aefe331e005e527bbab09a2&o=&hp=1",
+            "https://cf.bstatic.com/xdata/images/hotel/max1280x900/144470771.jpg?k=107e707d1e5a6305d4bf49890a3bfb4cf3855dc6e3f5cb29737a9386fa789b0b&o=&hp=1",
+        ],
+        type: "Sigle"
+    },
+    {
         name: "The Corner's unique house",
         location: "เชียงใหม่, ไทย",
         rating: 9.7,
