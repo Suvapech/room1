@@ -126,7 +126,6 @@ export default function AvailableRooms() {
                   <th className="py-3 px-4 text-left">หมายเลขห้อง</th>
                   <th className="py-3 px-4 text-left">สถานะ</th>
                   <th className="py-3 px-4 text-left">ราคา</th>
-                  <th className="py-3 px-4 text-left">รายละเอียด</th>
                 </tr>
               </thead>
               <tbody>
@@ -136,14 +135,6 @@ export default function AvailableRooms() {
                     <td className="py-3 px-4 text-green-600">{room.status}</td>
                     <td className="py-3 px-4">
                       {(room.price ?? 1000).toLocaleString()} บาท
-                    </td>
-                    <td className="py-3 px-4">
-                      <Link
-                        href={`/rooms/${room.id}/details`}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-                      >
-                        ดูรายละเอียด
-                      </Link>
                     </td>
                   </tr>
                 ))}

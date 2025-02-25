@@ -42,61 +42,61 @@ export default function Create({ rooms, existingBookings }) {
   const uniqueRooms = Array.from(new Set(availableRooms.map(room => room.room_number)))
     .map(roomNumber => availableRooms.find(room => room.room_number === roomNumber));
 
-    const handleSubmit = (e) => {
-      e.preventDefault();
-    
-      if (!rooms || !Array.isArray(rooms)) {
-        console.error("Rooms data is undefined or not an array.");
-        return;
-      }
-    
-      const checkInDate = new Date(data.check_in_date);
-      const checkOutDate = new Date(data.check_out_date);
-    
-      // ตรวจสอบว่าห้องนี้ถูกจองในช่วงวันนั้นๆ แล้วหรือไม่
-      const isRoomBooked = rooms.some(room => 
-        room.id === data.room_id &&
-        room.status === 'reserved' &&
-        (
-          (new Date(room.check_in_date) <= checkOutDate && new Date(room.check_out_date) >= checkInDate)
-        )
-      );      
-    
-      if (isRoomBooked) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!rooms || !Array.isArray(rooms)) {
+      console.error("Rooms data is undefined or not an array.");
+      return;
+    }
+
+    const checkInDate = new Date(data.check_in_date);
+    const checkOutDate = new Date(data.check_out_date);
+
+    // ตรวจสอบว่าห้องนี้ถูกจองในช่วงวันนั้นๆ แล้วหรือไม่
+    const isRoomBooked = rooms.some(room =>
+      room.id === data.room_id &&
+      room.status === 'reserved' &&
+      (
+        (new Date(room.check_in_date) <= checkOutDate && new Date(room.check_out_date) >= checkInDate)
+      )
+    );
+
+    if (isRoomBooked) {
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ห้องนี้ถูกจองไปแล้วในช่วงเวลาที่คุณเลือก กรุณาเลือกห้องอื่น',
+      });
+      return;
+    }
+
+
+    // ส่งข้อมูลการจองไปยังเซิร์ฟเวอร์
+    post('/bookings', {
+      onSuccess: () => {
+        const paymentURL = `https://promptpay.io/0832654075/${totalPrice}`;
+
         Swal.fire({
-          icon: 'error',
-          title: 'เกิดข้อผิดพลาด',
-          text: 'ห้องนี้ถูกจองไปแล้วในช่วงเวลาที่คุณเลือก กรุณาเลือกห้องอื่น',
-        });
-        return;
-      }
-      
-    
-      // ส่งข้อมูลการจองไปยังเซิร์ฟเวอร์
-      post('/bookings', {
-        onSuccess: () => {
-          const paymentURL = `https://promptpay.io/0832654075/${totalPrice}`;
-    
-          Swal.fire({
-            title: 'การจองสำเร็จ',
-            html: `
+          title: 'การจองสำเร็จ',
+          html: `
               <p>กรุณาชำระเงินจำนวน <strong>${totalPrice.toLocaleString()} บาท</strong></p>
               <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
                 <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(paymentURL)}&size=200x200" alt="QR Code" />
               </div>
             `,
-            confirmButtonText: 'เสร็จสิ้น',
-          });
-        },
-        onError: (errors) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            text: errors.room_id || errors.message || 'กรุณาลองใหม่อีกครั้ง',
-          });
-        },
-      });
-    };
+          confirmButtonText: 'เสร็จสิ้น',
+        });
+      },
+      onError: (errors) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: errors.room_id || errors.message || 'กรุณาลองใหม่อีกครั้ง',
+        });
+      },
+    });
+  };
 
   return (
     <AuthenticatedLayout>
@@ -127,22 +127,28 @@ export default function Create({ rooms, existingBookings }) {
           </div>
 
           <div>
-  <label className="block mb-2 text-lg font-medium text-gray-700">เลขห้อง</label>
-  <select
-    value={data.room_id || ''}
-    onChange={(e) => setData('room_id', e.target.value)}
-    className="border p-3 w-full rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-  >
-    <option value="">-- เลือกหมายเลขห้อง --</option>
-    {uniqueRooms.map((room) => (
-      <option key={room.id} value={room.id}>
-        {room.room_number} - {room.status === 'reserved' ? 'ถูกจอง' : 'not_reserved'}
-      </option>
-    ))}
-  </select>
-  {errors.room_id && <div className="text-red-500 mt-1">{errors.room_id}</div>}
-</div>
-
+            <label className="block text-lg font-medium mb-2">เลือกห้อง</label>
+            <select
+              name="room_id"
+              value={data.room_id}  // Use 'data' instead of 'formData'
+              onChange={(e) => setData('room_id', e.target.value)}  // Correct onChange handler
+              className={`w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.room_id ? 'border-red-500' : ''}`}
+            >
+              {rooms
+                .map((room) => room.room_number) // เลือกเลขห้อง
+                .filter((value, index, self) => self.indexOf(value) === index) // กรองห้องที่ซ้ำ
+                .sort() // เรียงลำดับ
+                .map((roomNumber) => {
+                  const room = rooms.find((r) => r.room_number === roomNumber);
+                  return (
+                    <option key={room.id} value={room.id}>
+                      ห้อง {room.room_number} ({room.status})
+                    </option>
+                  );
+                })}
+            </select>
+            {errors.room_id && <p className="text-red-500 text-sm">{errors.room_id}</p>}
+          </div>
 
           <div>
             <label className="block mb-2 text-lg font-medium text-gray-700">Check-in Date</label>

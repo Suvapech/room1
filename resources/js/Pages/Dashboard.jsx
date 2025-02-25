@@ -234,7 +234,6 @@ export default function RoomRecommendation() {
                                 />
                                 <div className="p-6">
                                     <h4 className="text-xl font-semibold text-gray-800">{room.name}</h4>
-                                    <p className="text-gray-600 text-sm">{room.location}</p>
                                     <p className="mt-2 text-blue-600 font-semibold">{room.rating} ★ </p>
                                 </div>
                             </div>
@@ -282,9 +281,9 @@ export default function RoomRecommendation() {
 
                     <div className="mt-8 p-6 bg-white shadow-md rounded-lg">
                         <h3 className="text-2xl font-semibold mb-4">ช่องทางการติดต่อ</h3>
-                        <p className="text-lg">โทรศัพท์: <span className="text-blue-500">012-345-6789</span></p>
-                        <p className="text-lg">อีเมล: <span className="text-blue-500">contact@example.com</span></p>
-                        <p className="text-lg">ที่อยู่: <span className="text-blue-500">123 ถนนตัวอย่าง, เชียงใหม่, ไทย</span></p>
+                        <p className="text-lg">โทรศัพท์: <span className="text-blue-500">083-469-4559</span></p>
+                        <p className="text-lg">อีเมล: <span className="text-blue-500">Admin@gmail.com</span></p>
+                        <p className="text-lg">ที่อยู่: <span className="text-blue-500">123 ถนนบางเขน, เชียงใหม่, ไทย</span></p>
                     </div>
 
                     <div className="mt-8 p-6 bg-white shadow-sm rounded-lg">
